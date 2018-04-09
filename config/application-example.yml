@@ -1,0 +1,15 @@
+zuul:
+  strip-prefix: false
+  routes:
+    default:
+      path: /**
+      url: http://localhost:12345/
+
+logging:
+  level:
+    edu: TRACE
+
+
+ribbon:
+  eureka:
+    enabled: false

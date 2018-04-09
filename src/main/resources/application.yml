@@ -1,0 +1,6 @@
+zuul:
+  strip-prefix: false
+
+ribbon:
+  eureka:
+    enabled: false
