@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+
 /**
  * @author Maxime Deravet
  * Date: 4/9/18
@@ -20,7 +22,7 @@ public class LoggingFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
-        return "pre";
+        return PRE_TYPE;
     }
 
     @Override
