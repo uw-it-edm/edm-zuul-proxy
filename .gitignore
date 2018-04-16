@@ -4,6 +4,7 @@
 application.pid
 
 out/
+classes/
 
 ### STS ###
 .apt_generated
