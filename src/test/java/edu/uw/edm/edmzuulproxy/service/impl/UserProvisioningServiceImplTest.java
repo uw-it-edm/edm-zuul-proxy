@@ -3,6 +3,7 @@ package edu.uw.edm.edmzuulproxy.service.impl;
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.model.AWSLambdaException;
 import com.amazonaws.services.lambda.model.InvokeResult;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.apache.http.HttpStatus;
 import org.junit.Before;
@@ -44,7 +45,7 @@ public class UserProvisioningServiceImplTest {
     }
 
     @Test
-    public void provisionValidAcsUser() {
+    public void provisionValidAcsUser() throws JsonProcessingException {
         InvokeResult mockInvokeResult = mock(InvokeResult.class);
         when(mockInvokeResult.getStatusCode()).thenReturn(HttpStatus.SC_OK);
         when(awsLambdaClient.invoke(any())).thenReturn(mockInvokeResult);
@@ -57,7 +58,7 @@ public class UserProvisioningServiceImplTest {
     }
 
     @Test(expected = AWSLambdaException.class)
-    public void provisionInvalidAcsUser() {
+    public void provisionInvalidAcsUser() throws JsonProcessingException {
         InvokeResult mockInvokeResult = mock(InvokeResult.class);
         when(mockInvokeResult.getStatusCode()).thenReturn(HttpStatus.SC_UNPROCESSABLE_ENTITY);
         when(awsLambdaClient.invoke(any())).thenReturn(mockInvokeResult);

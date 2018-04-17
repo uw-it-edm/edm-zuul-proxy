@@ -37,10 +37,11 @@ public class UserProvisioningServiceImpl implements UserProvisioningService {
 
     @Override
     @Cacheable("acs-users")
-    public String provisionAcsUser(String userId) {
-        log.info("Provision ACS User: {} ", userId);
+    public String provisionAcsUser(String userId) throws JsonProcessingException {
+        log.debug("Provision ACS User: {} ", userId);
 
-        final String payload = createAcsUserSyncPayload(userId);
+        final AcsUserSyncInput acsUserSyncInput = new AcsUserSyncInput(securityProperties.getAuthenticationHeaderName(), userId);
+        final String payload = OBJECT_MAPPER.writeValueAsString(acsUserSyncInput);
         final InvokeRequest req = new InvokeRequest()
                 .withFunctionName(awsProperties.getAcsUserSyncFunctionName())
                 .withPayload(payload);
@@ -49,18 +50,7 @@ public class UserProvisioningServiceImpl implements UserProvisioningService {
         if (HttpStatus.SC_OK == result.getStatusCode()) {
             return userId;
         } else {
-            throw new AWSLambdaException("Error Provisioning ACS User. Status-code:" + result.getStatusCode() + ", function-error: " + result.getFunctionError());
+            throw new AWSLambdaException("Error Provisioning ACS User. Status-code: " + result.getStatusCode() + ", function-error: " + result.getFunctionError());
         }
-    }
-
-    private String createAcsUserSyncPayload(String userId) {
-        final AcsUserSyncInput acsUserSyncInput = new AcsUserSyncInput(securityProperties.getAuthenticationHeaderName(), userId);
-        String payload;
-        try {
-            payload = OBJECT_MAPPER.writeValueAsString(acsUserSyncInput);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to convert AcsUserSyncInput to JSON", e);
-        }
-        return payload;
     }
 }

@@ -46,7 +46,11 @@ public class AcsUserSyncFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         Principal user = request.getUserPrincipal();
 
-        userProvisioningService.provisionAcsUser(user.getName());
+        try {
+            userProvisioningService.provisionAcsUser(user.getName());
+        } catch (Exception e) {
+            log.error("Error Provisioning ACS User: ", e);
+        }
 
         return null;
     }
