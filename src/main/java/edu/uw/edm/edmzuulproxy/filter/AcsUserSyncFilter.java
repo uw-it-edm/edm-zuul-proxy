@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import edu.uw.edm.edmzuulproxy.service.UserProvisioningService;
 import lombok.extern.slf4j.Slf4j;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 @Slf4j
 @Component
@@ -27,7 +27,7 @@ public class AcsUserSyncFilter extends ZuulFilter {
 
     @Override
     public String filterType() {
-        return ROUTE_TYPE;
+        return PRE_TYPE;
     }
 
     @Override
