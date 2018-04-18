@@ -4,3 +4,7 @@ zuul:
 ribbon:
   eureka:
     enabled: false
+uw:
+  profile:
+    security:
+      authentication-header-name: auth-header
