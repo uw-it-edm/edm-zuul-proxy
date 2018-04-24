@@ -84,6 +84,8 @@ public class AuthenticationConfiguration {
 
             http.addFilterBefore(requestHeaderAuthenticationFilter(),
                     UsernamePasswordAuthenticationFilter.class);
+
+            http.headers().frameOptions().disable();
         }
 
 
