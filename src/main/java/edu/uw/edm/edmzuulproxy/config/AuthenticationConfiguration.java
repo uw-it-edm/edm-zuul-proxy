@@ -76,7 +76,7 @@ public class AuthenticationConfiguration {
                     .antMatchers(HttpMethod.OPTIONS)
                     .permitAll()
                     .anyRequest()
-                    .authenticated();
+                    .permitAll();
 
 
             http.sessionManagement()
