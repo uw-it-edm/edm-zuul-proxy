@@ -37,21 +37,28 @@ public class AcsUserSyncFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return true;
+        if (log.isTraceEnabled()) {
+            String s = getCurrentUser() != null ? "" : "not ";
+            log.trace(s+ "filtering with AcsUserSyncFilter");
+        }
+        return getCurrentUser() != null;
     }
 
     @Override
     public Object run() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletRequest request = ctx.getRequest();
-        Principal user = request.getUserPrincipal();
-
         try {
+            Principal user = getCurrentUser();
             userProvisioningService.provisionAcsUser(user.getName());
         } catch (Exception e) {
             log.error("Error Provisioning ACS User: ", e);
         }
 
         return null;
+    }
+
+    private Principal getCurrentUser() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletRequest request = ctx.getRequest();
+        return request.getUserPrincipal();
     }
 }
