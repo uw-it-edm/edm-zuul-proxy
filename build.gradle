@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.0.3.RELEASE'
-        springCloudReleaseTrain = 'Finchley.M9'
+        springCloudReleaseTrain = 'Finchley.RC2'
     }
     repositories {
         jcenter()
@@ -38,7 +38,6 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
 }
 
