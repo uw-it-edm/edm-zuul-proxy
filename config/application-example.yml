@@ -1,0 +1,28 @@
+zuul:
+  strip-prefix: false
+  routes:
+    default:
+      path: /**
+      url: http://localhost:12345/
+
+logging:
+  level:
+    edu: TRACE
+
+spring:
+  cache:
+      cache-names: acs-users
+      caffeine:
+          spec: maximumSize=1000, expireAfterAccess=600s
+
+ribbon:
+  eureka:
+    enabled: false
+
+uw:
+  profile:
+    security:
+      authentication-header-name: auth-header
+  aws:
+    region: us-west-2
+    acsUserSyncFunctionName: acs-user-sync-function-name
