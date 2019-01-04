@@ -12,8 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
- * @author Maxime Deravet
- * Date: 4/9/18
+ * @author Maxime Deravet Date: 4/9/18
  */
 @Slf4j
 @Component
@@ -32,7 +31,7 @@ public class LoggingFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return true;
+        return log.isTraceEnabled();
     }
 
     @Override
