@@ -13,11 +13,13 @@ import javax.servlet.http.HttpServletRequest;
 import edu.uw.edm.edmzuulproxy.service.UserProvisioningService;
 import lombok.extern.slf4j.Slf4j;
 
+import static edu.uw.edm.edmzuulproxy.filter.CertificateAuthenticationFilter.CERTIFICATE_AUTHORIZATION_FILTER_ORDER;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 @Slf4j
 @Component
 public class AcsUserSyncFilter extends ZuulFilter {
+    static final int ACS_USER_SYNC_FILTER_ORDER = CERTIFICATE_AUTHORIZATION_FILTER_ORDER + 1;
     private UserProvisioningService userProvisioningService;
 
     @Autowired
@@ -32,14 +34,14 @@ public class AcsUserSyncFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return 2;
+        return ACS_USER_SYNC_FILTER_ORDER;
     }
 
     @Override
     public boolean shouldFilter() {
         if (log.isTraceEnabled()) {
             String s = getCurrentUser() != null ? "" : "not ";
-            log.trace(s+ "filtering with AcsUserSyncFilter");
+            log.trace(s + "filtering with AcsUserSyncFilter");
         }
         return getCurrentUser() != null;
     }

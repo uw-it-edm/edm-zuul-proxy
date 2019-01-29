@@ -2,6 +2,8 @@ buildscript {
     ext {
         springBootVersion = '2.0.5.RELEASE'
         springCloudReleaseTrain = 'Finchley.SR2'
+
+        springDataDynamoDBVersion = '5.0.4'
     }
     repositories {
         jcenter()
@@ -43,6 +45,8 @@ repositories {
 
 bootJar {
     baseName = 'edm-zuul-proxy'
+    mainClassName= 'edu.uw.edm.edmzuulproxy.EdmZuulProxyApplication'
+
 }
 task wrapper(type: Wrapper) {
     gradleVersion = '4.5.1'
@@ -56,6 +60,9 @@ dependencies {
     compile('com.amazonaws:aws-java-sdk-lambda')
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile('com.github.ben-manes.caffeine:caffeine')
+
+    compile("com.github.derjust:spring-data-dynamodb:$springDataDynamoDBVersion")
+
     runtime('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
     testCompile('org.springframework.boot:spring-boot-starter-test')

@@ -5,6 +5,14 @@ ribbon:
   eureka:
     enabled: false
 uw:
+  cert:
+    certificateNameHeader: X_CERTIFICATE
   profile:
     security:
       authentication-header-name: auth-header
+
+spring:
+  cache:
+    cache-names: acs-users, authorized-uri
+    caffeine:
+      spec: maximumSize=1, expireAfterAccess=1m
