@@ -12,7 +12,7 @@ public class CertificateAuthorizationId implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String certificateName;
-    private String uriRegex;
+    private String methodAndURI;
 
     @DynamoDBHashKey
     public String getCertificateName() {
@@ -20,16 +20,16 @@ public class CertificateAuthorizationId implements Serializable {
     }
 
     @DynamoDBRangeKey
-    public String getUriRegex() {
-        return uriRegex;
+    public String getMethodAndURI() {
+        return methodAndURI;
     }
 
     public void setCertificateName(String certificateName) {
         this.certificateName = certificateName;
     }
 
-    public void setUriRegex(String uriRegex) {
-        this.uriRegex = uriRegex;
+    public void setMethodAndURI(String methodAndURI) {
+        this.methodAndURI = methodAndURI;
     }
 
 }

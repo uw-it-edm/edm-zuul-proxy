@@ -41,18 +41,23 @@ public class CertificateAuthorization {
     }
 
 
-    @DynamoDBRangeKey(attributeName = "uriRegex")
-    public String getUriRegex() {
-        return certificateAuthorizationId != null ? certificateAuthorizationId.getUriRegex() : null;
+    @DynamoDBRangeKey(attributeName = "methodAndURI")
+    public String getMethodAndURI() {
+        return certificateAuthorizationId != null ? certificateAuthorizationId.getMethodAndURI() : null;
+
     }
 
-    public void setUriRegex(String uriRegex) {
+    public void setMethodAndURI(String methodAndURI) {
         if (certificateAuthorizationId == null) {
             certificateAuthorizationId = new CertificateAuthorizationId();
         }
-        certificateAuthorizationId.setUriRegex(uriRegex);
+        certificateAuthorizationId.setMethodAndURI(methodAndURI);
     }
 
+    @DynamoDBAttribute
+    @Getter
+    @Setter
+    private String uriRegex;
 
     @DynamoDBAttribute
     @Getter

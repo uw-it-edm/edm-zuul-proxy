@@ -107,6 +107,9 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         newAuthorization.setUriRegex(uriRegex);
         newAuthorization.setHttpMethods(String.join(HTTP_METHODS_SEPARATOR, httpMethods));
         newAuthorization.setUwGroups(String.join(UW_GROUPS_SEPARATOR, uwGroups));
+
+        newAuthorization.setMethodAndURI(newAuthorization.getHttpMethods() + " " + newAuthorization.getUriRegex());
+
         if (contactEmail != null) {
             newAuthorization.setContactEmails(String.join(CONTACT_EMAILS_SEPARATOR, httpMethods));
         }
