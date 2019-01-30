@@ -1,4 +1,4 @@
-package edu.uw.edm.edmzuulproxy.certificateauthorizer.model;
+package edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;

@@ -6,13 +6,15 @@ import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.CertificateAuthorizationRepository;
-import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CertificateAuthorization;
+import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CompiledCertificateAuthorization;
+import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.CertificateAuthorizationDAO;
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.service.CertificateAuthorizerService;
 import edu.uw.edm.edmzuulproxy.security.User;
 import lombok.extern.slf4j.Slf4j;
@@ -31,23 +33,25 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
     public static final String CONTACT_EMAILS_SEPARATOR = DEFAULT_SEPARATOR;
 
 
+    private CertificateAuthorizationRetriever certificateAuthorizationRetriever;
     private CertificateAuthorizationRepository certificateAuthorizationRepository;
 
     @Autowired
-    public CertificateAuthorizerServiceImpl(CertificateAuthorizationRepository certificateAuthorizationRepository) {
+    public CertificateAuthorizerServiceImpl(CertificateAuthorizationRetriever certificateAuthorizationRetriever, CertificateAuthorizationRepository certificateAuthorizationRepository) {
+        this.certificateAuthorizationRetriever = certificateAuthorizationRetriever;
         this.certificateAuthorizationRepository = certificateAuthorizationRepository;
     }
 
     @Override
     @Cacheable(cacheNames = "authorized-uri")
     public boolean isAllowedForUri(String certificateName, HttpMethod httpMethod, String uri, User user) {
-        log.trace("Checking if cert {} - user {} is allowed to access {} - {}", certificateName, user.getUsername(), httpMethod.name(), uri);
+        log.trace("Checking if cert {} - user {} is allowed to access {} - {}", certificateName, user, httpMethod.name(), uri);
 
-        final Iterable<CertificateAuthorization> byCertificateName = certificateAuthorizationRepository.findByCertificateName(certificateName);
+        final Iterable<CompiledCertificateAuthorization> byCertificateName = certificateAuthorizationRetriever.findByCertificateName(certificateName);
 
 
-        for (CertificateAuthorization certificateAuthorization : byCertificateName) {
-            if (isAuthorizedForRequest(certificateAuthorization, httpMethod, uri, user)) {
+        for (CompiledCertificateAuthorization certificateAuthorizationDAO : byCertificateName) {
+            if (isAuthorizedForRequest(certificateAuthorizationDAO, httpMethod, uri, user)) {
                 return true;
             }
         }
@@ -55,39 +59,38 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         return false;
     }
 
-    private boolean isAuthorizedForRequest(CertificateAuthorization certificateAuthorization, HttpMethod httpMethod, String uri, User user) {
+    private boolean isAuthorizedForRequest(CompiledCertificateAuthorization certificateAuthorizationDAO, HttpMethod httpMethod, String uri, User user) {
 
-        final boolean methodIsAuthorized = methodIsAuthorized(httpMethod, certificateAuthorization);
-        final boolean uriIsAuthorized = uriIsAuthorized(uri, certificateAuthorization);
-        final boolean uwGroupsMatch = uwGroupsMatch(user, certificateAuthorization);
+        final boolean authorized = methodIsAuthorized(httpMethod, certificateAuthorizationDAO) &&
+                uriIsAuthorized(uri, certificateAuthorizationDAO)
+                && uwGroupsMatch(user, certificateAuthorizationDAO);
 
-
-        final boolean authorized = methodIsAuthorized &&
-                uriIsAuthorized &&
-                uwGroupsMatch;
-
-        log.trace("method : {} , uri : {}, uwGroups: {} => result : {}", methodIsAuthorized, uriIsAuthorized, uwGroupsMatch, authorized);
         return authorized;
 
     }
 
-    private boolean uwGroupsMatch(User user, CertificateAuthorization certificateAuthorization) {
-        return certificateAuthorization.getUwGroups() == null || certificateAuthorization.getUwGroups().contains(UW_GROUPS_WILDCARD) || userIsMemberOfOneGroup(user, certificateAuthorization);
+    private boolean uwGroupsMatch(User user, CompiledCertificateAuthorization certificateAuthorization) {
+        return certificateAuthorization.getUwGroups() == null
+                || certificateAuthorization.getUwGroups().contains(UW_GROUPS_WILDCARD)
+                || userIsMemberOfOneGroup(user, certificateAuthorization);
     }
 
-    private boolean userIsMemberOfOneGroup(User user, CertificateAuthorization certificateAuthorization) {
-        //TODO
-        return false;
+    private boolean userIsMemberOfOneGroup(User user, CompiledCertificateAuthorization certificateAuthorization) {
+
+
+        return user!=null && user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> certificateAuthorization.getUwGroups().contains(authority));
     }
 
-    private boolean uriIsAuthorized(String uri, CertificateAuthorization certificateAuthorization) {
-        final Pattern pattern = Pattern.compile(certificateAuthorization.getUriRegex());
-
-        return pattern.matcher(uri).matches();
+    private boolean uriIsAuthorized(String uri, CompiledCertificateAuthorization certificateAuthorization) {
+        return certificateAuthorization.getUriRegex().matcher(uri).matches();
     }
 
-    private boolean methodIsAuthorized(HttpMethod httpMethod, CertificateAuthorization authorization) {
-        return authorization.getHttpMethods().contains(HTTP_METHOD_WILDCARD) || authorization.getHttpMethods().contains(httpMethod.name());
+    private boolean methodIsAuthorized(HttpMethod httpMethod, CompiledCertificateAuthorization authorization) {
+        return authorization.getHttpMethods().contains(HTTP_METHOD_WILDCARD)
+                || authorization.getHttpMethods().contains(httpMethod.name());
     }
 
 
@@ -98,7 +101,7 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         Preconditions.checkArgument(hasValidHttpMethods(httpMethods), "httpMethods are invalid");
 
 
-        CertificateAuthorization newAuthorization = new CertificateAuthorization();
+        CertificateAuthorizationDAO newAuthorization = new CertificateAuthorizationDAO();
 
         //TODO the setKey might want to go somewhere else
         //newAuthorization.setKey(createAuthorizationHashKey(certificateName, uriRegex));
@@ -117,7 +120,7 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
 
         certificateAuthorizationRepository.save(newAuthorization);
 
-        final Iterable<CertificateAuthorization> byCertificateName = certificateAuthorizationRepository.findByCertificateName(certificateName);
+        final Iterable<CertificateAuthorizationDAO> byCertificateName = certificateAuthorizationRepository.findByCertificateName(certificateName);
 
         byCertificateName.forEach(addedCertificate -> {
             log.info("{} - {}", addedCertificate.getCertificateName(), addedCertificate.getUriRegex());

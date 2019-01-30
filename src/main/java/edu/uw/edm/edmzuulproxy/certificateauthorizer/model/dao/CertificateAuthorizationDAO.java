@@ -1,4 +1,4 @@
-package edu.uw.edm.edmzuulproxy.certificateauthorizer.model;
+package edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CertificateAuthorization.TABLE_NAME;
+import static edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.CertificateAuthorizationDAO.TABLE_NAME;
 
 /**
  * @author Maxime Deravet Date: 2019-01-28
@@ -21,7 +21,7 @@ import static edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CertificateAut
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateAuthorization {
+public class CertificateAuthorizationDAO {
 
     public static final String TABLE_NAME = "edm-zuul-proxy-certificate-authorization";
 

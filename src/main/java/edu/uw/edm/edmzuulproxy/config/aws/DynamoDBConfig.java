@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Optional;
 
-import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CertificateAuthorization;
+import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.CertificateAuthorizationDAO;
 import edu.uw.edm.edmzuulproxy.properties.AwsProperties;
 
 /**
@@ -56,11 +56,11 @@ public class DynamoDBConfig {
         if (isWorkstationEnvironment(awsProperties)) {
 
             Optional<String> table = amazonDynamoDB.listTables().getTableNames().stream().
-                    filter(tableName -> tableName.equals(CertificateAuthorization.TABLE_NAME)).findFirst();
+                    filter(tableName -> tableName.equals(CertificateAuthorizationDAO.TABLE_NAME)).findFirst();
 
             if (!table.isPresent()) {
                 amazonDynamoDB.createTable(new DynamoDBMapper(amazonDynamoDB)
-                        .generateCreateTableRequest(CertificateAuthorization.class)
+                        .generateCreateTableRequest(CertificateAuthorizationDAO.class)
                         .withProvisionedThroughput(new ProvisionedThroughput(1000L, 1000L)));
             }
 

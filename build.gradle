@@ -4,6 +4,7 @@ buildscript {
         springCloudReleaseTrain = 'Finchley.SR2'
 
         springDataDynamoDBVersion = '5.0.4'
+        gwsClientVersion = "0.0.1-feature.add-resttemplate-SNAPSHOT"
     }
     repositories {
         jcenter()
@@ -62,6 +63,9 @@ dependencies {
     compile('com.github.ben-manes.caffeine:caffeine')
 
     compile("com.github.derjust:spring-data-dynamodb:$springDataDynamoDBVersion")
+
+    compile("edu.uw.edm.gws:gws-client:$gwsClientVersion")
+    compile("edu.uw.edm.gws:gws-client-spring-boot-starter:$gwsClientVersion")
 
     runtime('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
