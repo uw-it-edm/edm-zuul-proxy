@@ -84,7 +84,7 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
 
 
     private void sendAuthorizationError(String certificateName, HttpMethod httpMethod, String uri, User user, RequestContext ctx) {
-        log.debug("certificate {} - {} is not allowed to access {} - {}", certificateName, user.getUsername(), httpMethod.name(), uri);
+        log.warn("certificate {} - {} is not allowed to access {} - {}", certificateName, user.getUsername(), httpMethod.name(), uri);
 
         ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
 

@@ -5,7 +5,7 @@ ribbon:
   eureka:
     enabled: false
 uw:
-  cert:
+  cert-authentication:
     certificateNameHeader: X_CERTIFICATE
   profile:
     security:

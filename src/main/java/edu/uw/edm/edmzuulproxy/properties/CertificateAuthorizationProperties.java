@@ -11,7 +11,7 @@ import lombok.Data;
  */
 
 @Component
-@ConfigurationProperties(prefix = "uw.cert")
+@ConfigurationProperties(prefix = "uw.cert-authentication")
 @Data
 public class CertificateAuthorizationProperties {
 

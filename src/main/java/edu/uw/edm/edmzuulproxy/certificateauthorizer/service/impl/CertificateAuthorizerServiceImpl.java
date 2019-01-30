@@ -99,6 +99,8 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         Preconditions.checkArgument(!Strings.isBlank(certificateName), "certificateName cannot be blank");
         Preconditions.checkArgument(isValidRegex(uriRegex), "uriRegex is invalid");
         Preconditions.checkArgument(hasValidHttpMethods(httpMethods), "httpMethods are invalid");
+        Preconditions.checkNotNull(uwGroups, "uwGroup is required");
+
 
 
         CertificateAuthorizationDAO newAuthorization = new CertificateAuthorizationDAO();

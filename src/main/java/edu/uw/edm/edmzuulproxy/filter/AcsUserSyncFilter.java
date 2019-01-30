@@ -41,7 +41,7 @@ public class AcsUserSyncFilter extends ZuulFilter {
     public boolean shouldFilter() {
         if (log.isTraceEnabled()) {
             String s = getCurrentUser() != null ? "" : "not ";
-            log.trace(s + "filtering with AcsUserSyncFilter");
+            log.trace("{} filtering with AcsUserSyncFilter", s);
         }
         return getCurrentUser() != null;
     }
