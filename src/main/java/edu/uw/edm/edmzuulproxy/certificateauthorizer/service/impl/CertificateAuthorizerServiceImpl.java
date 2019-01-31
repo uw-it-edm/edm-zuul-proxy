@@ -105,9 +105,6 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
 
         CertificateAuthorizationDAO newAuthorization = new CertificateAuthorizationDAO();
 
-        //TODO the setKey might want to go somewhere else
-        //newAuthorization.setKey(createAuthorizationHashKey(certificateName, uriRegex));
-
         newAuthorization.setCertificateName(certificateName);
         newAuthorization.setUriRegex(uriRegex);
         newAuthorization.setHttpMethods(String.join(HTTP_METHODS_SEPARATOR, httpMethods));
