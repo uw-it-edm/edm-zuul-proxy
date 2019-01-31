@@ -1,4 +1,4 @@
-package edu.uw.edm.edmzuulproxy.config;
+package edu.uw.edm.edmzuulproxy.config.aws;
 
 import com.amazonaws.services.lambda.AWSLambda;
 import com.amazonaws.services.lambda.AWSLambdaClientBuilder;

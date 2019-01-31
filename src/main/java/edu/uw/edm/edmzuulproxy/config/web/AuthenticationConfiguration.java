@@ -1,4 +1,4 @@
-package edu.uw.edm.edmzuulproxy.config;
+package edu.uw.edm.edmzuulproxy.config.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;

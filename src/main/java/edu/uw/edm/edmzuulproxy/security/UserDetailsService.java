@@ -14,6 +14,11 @@ import java.util.Collections;
 @Service
 public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
+    private GroupsResolver groupsResolver;
+
+    public UserDetailsService(GroupsResolver groupsResolver) {
+        this.groupsResolver = groupsResolver;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -21,7 +26,8 @@ public class UserDetailsService implements org.springframework.security.core.use
             return null;
         }
 
-        return new User(username, "", Collections.emptyList());
+
+        return new User(username, "", groupsResolver.getGroupsForUser(username));
     }
 
 }
