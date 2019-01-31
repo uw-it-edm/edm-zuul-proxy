@@ -1,5 +1,8 @@
 package edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,12 @@ public class CertificateAuthorizationRetriever {
     }
 
     private CompiledCertificateAuthorization toCompiledCertificateAuthorization(CertificateAuthorizationDAO certificateAuthorizationDAO) {
+        Preconditions.checkNotNull(certificateAuthorizationDAO);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(certificateAuthorizationDAO.getCertificateName()));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(certificateAuthorizationDAO.getUriRegex()));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(certificateAuthorizationDAO.getHttpMethods()));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(certificateAuthorizationDAO.getUwGroups()));
+
         return CompiledCertificateAuthorization.builder()
                 .certificateName(certificateAuthorizationDAO.getCertificateName())
                 .uriRegex(Pattern.compile(certificateAuthorizationDAO.getUriRegex()))
