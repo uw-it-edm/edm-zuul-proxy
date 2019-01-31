@@ -70,15 +70,13 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
     }
 
     private boolean uwGroupsMatch(User user, CompiledCertificateAuthorization certificateAuthorization) {
-        return certificateAuthorization.getUwGroups() == null
-                || certificateAuthorization.getUwGroups().contains(UW_GROUPS_WILDCARD)
+        return certificateAuthorization.getUwGroups().contains(UW_GROUPS_WILDCARD)
                 || userIsMemberOfOneGroup(user, certificateAuthorization);
     }
 
     private boolean userIsMemberOfOneGroup(User user, CompiledCertificateAuthorization certificateAuthorization) {
 
-
-        return user!=null && user.getAuthorities()
+        return user != null && user.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority -> certificateAuthorization.getUwGroups().contains(authority));
@@ -100,7 +98,6 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         Preconditions.checkArgument(isValidRegex(uriRegex), "uriRegex is invalid");
         Preconditions.checkArgument(hasValidHttpMethods(httpMethods), "httpMethods are invalid");
         Preconditions.checkNotNull(uwGroups, "uwGroup is required");
-
 
 
         CertificateAuthorizationDAO newAuthorization = new CertificateAuthorizationDAO();
