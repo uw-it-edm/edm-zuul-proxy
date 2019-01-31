@@ -73,6 +73,8 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
         } catch (Exception e) {
             log.error("Error running CertificateAuthenticationFilter: ", e);
 
+            ctx.setResponseStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            ctx.setSendZuulResponse(false);
         }
 
         return null;

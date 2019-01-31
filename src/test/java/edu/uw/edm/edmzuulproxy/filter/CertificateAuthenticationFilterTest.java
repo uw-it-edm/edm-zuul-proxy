@@ -74,6 +74,23 @@ public class CertificateAuthenticationFilterTest {
     }
 
     @Test
+    public void shouldThrowAnErrorWhenExceptionTest() {
+        mockHttpServletRequest.setRequestURI("/my/uri");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenThrow(new RuntimeException());
+
+
+        CertificateAuthenticationFilter filter =newFilter();
+
+        filter.run();
+
+        assertThat(mockHttpServletResponse.getStatus(), is(500));
+
+    }
+
+    @Test
     public void shouldntFilterWhenNoCertHeaderTest() {
         mockHttpServletRequest.setRequestURI("/my/uri");
         mockHttpServletRequest.setMethod("GET");
@@ -95,10 +112,6 @@ public class CertificateAuthenticationFilterTest {
         assertTrue(filter.shouldFilter());
     }
 
-    private CertificateAuthenticationFilter newFilter() {
-        return new CertificateAuthenticationFilter(certificateAuthorizerService, certificateAuthorizationProperties, new ProxyRequestHelper(new ZuulProperties()));
-    }
-
     @Test
     public void whenUnauthorizedThen401Test() {
         mockHttpServletRequest.setRequestURI("/my/uri");
@@ -107,7 +120,7 @@ public class CertificateAuthenticationFilterTest {
 
         when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(false);
 
-        CertificateAuthenticationFilter filter = new CertificateAuthenticationFilter(certificateAuthorizerService, certificateAuthorizationProperties, new ProxyRequestHelper());
+        CertificateAuthenticationFilter filter = newFilter();
 
         filter.run();
 
@@ -124,7 +137,7 @@ public class CertificateAuthenticationFilterTest {
 
         when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
 
-        CertificateAuthenticationFilter filter = new CertificateAuthenticationFilter(certificateAuthorizerService, certificateAuthorizationProperties, new ProxyRequestHelper());
+        CertificateAuthenticationFilter filter = newFilter();
 
         filter.run();
 
@@ -132,4 +145,10 @@ public class CertificateAuthenticationFilterTest {
 
 
     }
+
+
+    private CertificateAuthenticationFilter newFilter() {
+        return new CertificateAuthenticationFilter(certificateAuthorizerService, certificateAuthorizationProperties, new ProxyRequestHelper(new ZuulProperties()));
+    }
+
 }
