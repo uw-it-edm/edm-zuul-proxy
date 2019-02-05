@@ -124,10 +124,6 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         });
     }
 
-    private String createAuthorizationHashKey(String certificateName, String uriRegex) {
-        return certificateName + "-" + uriRegex;
-    }
-
     private boolean hasValidHttpMethods(List<String> httpMethods) {
         Preconditions.checkNotNull(httpMethods, "httpMethods cannot be null");
         Preconditions.checkArgument(httpMethods.size() > 0, "httpMethods cannot be empty");

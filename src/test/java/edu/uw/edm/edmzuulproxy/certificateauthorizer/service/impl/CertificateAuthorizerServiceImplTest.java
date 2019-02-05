@@ -39,9 +39,6 @@ public class CertificateAuthorizerServiceImplTest {
     @Autowired
     private CertificateAuthorizerService service;
 
-    @Autowired
-    private CertificateAuthorizationRetriever certificateAuthorizationRetriever;
-
 
     @Test
     public void whenNoRepoEntryThenUnauthorizedTest() {

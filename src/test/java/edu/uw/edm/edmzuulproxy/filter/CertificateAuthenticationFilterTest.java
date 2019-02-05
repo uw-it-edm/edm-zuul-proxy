@@ -6,7 +6,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -62,10 +61,10 @@ public class CertificateAuthenticationFilterTest {
 
         RequestContext.testSetCurrentContext(context);
 
-        Authentication authentication = Mockito.mock(Authentication.class);
+        Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(new User("test", "", Collections.emptyList()));
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
     }
@@ -81,8 +80,8 @@ public class CertificateAuthenticationFilterTest {
         mockHttpServletRequest.setMethod("GET");
         mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
 
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(new AnonymousAuthenticationToken("key", "anonymousUser", Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(new AnonymousAuthenticationToken("key", "anonymousUser", Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
         SecurityContextHolder.setContext(securityContext);
 
 
