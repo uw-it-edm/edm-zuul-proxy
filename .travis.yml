@@ -24,7 +24,11 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-before_install: git checkout $(git branch --contains $(git rev-parse HEAD)|tail -n1|tr -d ' ') || true
+before_install:
+  - git checkout $(git branch --contains $(git rev-parse HEAD)|tail -n1|tr -d ' ') || true
+  - sudo apt-get install jq
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r '.assets[0].browser_download_url')
+
 
 jobs:
   include:
@@ -42,7 +46,8 @@ jobs:
       if: type = push
 
 after_success:
-- ./gradlew jacocoTestReport coveralls
+  - ./gradlew jacocoTestReport coveralls
+  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
 
 notifications:
   email: false
