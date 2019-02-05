@@ -45,7 +45,7 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
     @Override
     @Cacheable(cacheNames = "authorized-uri")
     public boolean isAllowedForUri(String certificateName, HttpMethod httpMethod, String uri, User user) {
-        log.trace("Checking if cert {} - user {} is allowed to access {} - {}", certificateName, user, httpMethod.name(), uri);
+        log.trace("Checking if cert {} - user {} is allowed to access {} - {}", certificateName, user == null ? "anonymous" : user.getUsername(), httpMethod.name(), uri);
 
         final Iterable<CompiledCertificateAuthorization> byCertificateName = certificateAuthorizationRetriever.findByCertificateName(certificateName);
 

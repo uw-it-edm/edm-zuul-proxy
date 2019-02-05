@@ -54,6 +54,23 @@ public class CertificateAuthorizerServiceImplTest {
     }
 
     @Test
+    public void allPathAuthorizedTest() {
+        final CertificateAuthorizationDAO auth = new CertificateAuthorizationDAO();
+        auth.setUriRegex(".*");
+        auth.setHttpMethods("*");
+        auth.setCertificateName("cert");
+        auth.setUwGroups("*");
+
+        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        final User user = new User("test", "", getListOfAuthorities("group4", "group5", "group_2"));
+
+        final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/zuul/my/uri", user);
+
+        assertTrue(allowedForUri);
+
+    }
+
+    @Test
     public void whenNoUserAndAllGroupsThenAuthorizedTest() {
         final CertificateAuthorizationDAO auth = new CertificateAuthorizationDAO();
         auth.setUriRegex("/my/.*");

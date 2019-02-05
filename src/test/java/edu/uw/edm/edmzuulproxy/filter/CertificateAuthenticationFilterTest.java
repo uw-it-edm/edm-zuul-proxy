@@ -11,7 +11,9 @@ import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -74,6 +76,28 @@ public class CertificateAuthenticationFilterTest {
     }
 
     @Test
+    public void shoudlWorkWithAnonymousUserTest() {
+        mockHttpServletRequest.setRequestURI("/my/uri");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        Mockito.when(securityContext.getAuthentication()).thenReturn(new AnonymousAuthenticationToken("key", "anonymousUser", Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        SecurityContextHolder.setContext(securityContext);
+
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+
+        CertificateAuthenticationFilter filter = newFilter();
+
+        filter.run();
+
+        assertThat(mockHttpServletResponse.getStatus(), is(200));
+
+
+    }
+
+    @Test
     public void shouldThrowAnErrorWhenExceptionTest() {
         mockHttpServletRequest.setRequestURI("/my/uri");
         mockHttpServletRequest.setMethod("GET");
@@ -82,7 +106,7 @@ public class CertificateAuthenticationFilterTest {
         when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenThrow(new RuntimeException());
 
 
-        CertificateAuthenticationFilter filter =newFilter();
+        CertificateAuthenticationFilter filter = newFilter();
 
         filter.run();
 
