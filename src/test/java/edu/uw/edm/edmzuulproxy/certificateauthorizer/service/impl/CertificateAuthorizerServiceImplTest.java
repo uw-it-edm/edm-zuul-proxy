@@ -34,13 +34,13 @@ import static org.mockito.Mockito.when;
 public class CertificateAuthorizerServiceImplTest {
 
     @MockBean(reset = MockReset.BEFORE)
-    CertificateAuthorizationRepository mockRepository;
+    private CertificateAuthorizationRepository mockRepository;
 
     @Autowired
-    CertificateAuthorizerService service;
+    private CertificateAuthorizerService service;
 
     @Autowired
-    CertificateAuthorizationRetriever certificateAuthorizationRetriever;
+    private CertificateAuthorizationRetriever certificateAuthorizationRetriever;
 
 
     @Test

@@ -19,7 +19,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Slf4j
 @Component
 public class AcsUserSyncFilter extends ZuulFilter {
-    static final int ACS_USER_SYNC_FILTER_ORDER = CERTIFICATE_AUTHORIZATION_FILTER_ORDER + 1;
+    private static final int ACS_USER_SYNC_FILTER_ORDER = CERTIFICATE_AUTHORIZATION_FILTER_ORDER + 1;
     private UserProvisioningService userProvisioningService;
 
     @Autowired

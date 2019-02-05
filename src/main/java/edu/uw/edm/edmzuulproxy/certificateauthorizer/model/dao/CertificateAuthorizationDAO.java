@@ -18,7 +18,6 @@ import static edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.Certificat
  * @author Maxime Deravet Date: 2019-01-28
  */
 @DynamoDBTable(tableName = TABLE_NAME)
-
 @NoArgsConstructor
 @AllArgsConstructor
 public class CertificateAuthorizationDAO {
@@ -27,32 +26,6 @@ public class CertificateAuthorizationDAO {
 
     @Id
     private CertificateAuthorizationId certificateAuthorizationId;
-
-    @DynamoDBHashKey(attributeName = "certificateName")
-    public String getCertificateName() {
-        return certificateAuthorizationId != null ? certificateAuthorizationId.getCertificateName() : null;
-    }
-
-    public void setCertificateName(String certificateName) {
-        if (certificateAuthorizationId == null) {
-            certificateAuthorizationId = new CertificateAuthorizationId();
-        }
-        certificateAuthorizationId.setCertificateName(certificateName);
-    }
-
-
-    @DynamoDBRangeKey(attributeName = "methodAndURI")
-    public String getMethodAndURI() {
-        return certificateAuthorizationId != null ? certificateAuthorizationId.getMethodAndURI() : null;
-
-    }
-
-    public void setMethodAndURI(String methodAndURI) {
-        if (certificateAuthorizationId == null) {
-            certificateAuthorizationId = new CertificateAuthorizationId();
-        }
-        certificateAuthorizationId.setMethodAndURI(methodAndURI);
-    }
 
     @DynamoDBAttribute
     @Getter
@@ -79,4 +52,29 @@ public class CertificateAuthorizationDAO {
     @Setter
     private String notes;
 
+    @DynamoDBHashKey(attributeName = "certificateName")
+    public String getCertificateName() {
+        return certificateAuthorizationId != null ? certificateAuthorizationId.getCertificateName() : null;
+    }
+
+    public void setCertificateName(String certificateName) {
+        if (certificateAuthorizationId == null) {
+            certificateAuthorizationId = new CertificateAuthorizationId();
+        }
+        certificateAuthorizationId.setCertificateName(certificateName);
+    }
+
+
+    @DynamoDBRangeKey(attributeName = "methodAndURI")
+    public String getMethodAndURI() {
+        return certificateAuthorizationId != null ? certificateAuthorizationId.getMethodAndURI() : null;
+
+    }
+
+    public void setMethodAndURI(String methodAndURI) {
+        if (certificateAuthorizationId == null) {
+            certificateAuthorizationId = new CertificateAuthorizationId();
+        }
+        certificateAuthorizationId.setMethodAndURI(methodAndURI);
+    }
 }

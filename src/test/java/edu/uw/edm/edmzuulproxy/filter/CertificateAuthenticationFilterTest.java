@@ -38,12 +38,12 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 public class CertificateAuthenticationFilterTest {
 
-    public static final String CERTIFICATE_NAME_HEADER = "CERT_NAME";
-    CertificateAuthorizerService certificateAuthorizerService;
-    CertificateAuthorizationProperties certificateAuthorizationProperties;
+    private static final String CERTIFICATE_NAME_HEADER = "CERT_NAME";
+    private CertificateAuthorizerService certificateAuthorizerService;
+    private CertificateAuthorizationProperties certificateAuthorizationProperties;
 
-    MockHttpServletRequest mockHttpServletRequest;
-    MockHttpServletResponse mockHttpServletResponse;
+    private MockHttpServletRequest mockHttpServletRequest;
+    private MockHttpServletResponse mockHttpServletResponse;
 
     @Before
     public void initMocks() {
