@@ -6,12 +6,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -36,12 +37,12 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 public class CertificateAuthenticationFilterTest {
 
-    public static final String CERTIFICATE_NAME_HEADER = "CERT_NAME";
-    CertificateAuthorizerService certificateAuthorizerService;
-    CertificateAuthorizationProperties certificateAuthorizationProperties;
+    private static final String CERTIFICATE_NAME_HEADER = "CERT_NAME";
+    private CertificateAuthorizerService certificateAuthorizerService;
+    private CertificateAuthorizationProperties certificateAuthorizationProperties;
 
-    MockHttpServletRequest mockHttpServletRequest;
-    MockHttpServletResponse mockHttpServletResponse;
+    private MockHttpServletRequest mockHttpServletRequest;
+    private MockHttpServletResponse mockHttpServletResponse;
 
     @Before
     public void initMocks() {
@@ -60,10 +61,10 @@ public class CertificateAuthenticationFilterTest {
 
         RequestContext.testSetCurrentContext(context);
 
-        Authentication authentication = Mockito.mock(Authentication.class);
+        Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(new User("test", "", Collections.emptyList()));
-        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-        Mockito.when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
     }
@@ -71,6 +72,28 @@ public class CertificateAuthenticationFilterTest {
     @After
     public void reset() {
         RequestContext.getCurrentContext().clear();
+    }
+
+    @Test
+    public void shoudlWorkWithAnonymousUserTest() {
+        mockHttpServletRequest.setRequestURI("/my/uri");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(new AnonymousAuthenticationToken("key", "anonymousUser", Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS"))));
+        SecurityContextHolder.setContext(securityContext);
+
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+
+        CertificateAuthenticationFilter filter = newFilter();
+
+        filter.run();
+
+        assertThat(mockHttpServletResponse.getStatus(), is(200));
+
+
     }
 
     @Test
@@ -82,7 +105,7 @@ public class CertificateAuthenticationFilterTest {
         when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenThrow(new RuntimeException());
 
 
-        CertificateAuthenticationFilter filter =newFilter();
+        CertificateAuthenticationFilter filter = newFilter();
 
         filter.run();
 

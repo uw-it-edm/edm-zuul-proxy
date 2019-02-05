@@ -20,4 +20,4 @@ You'll find a db ui at http://localhost:8123/
 
 This will allow you to create a new entry in the dynamodb table
 
-    java -cp build/libs/edm-zuul-proxy-1.111.0-detached-SNAPSHOT+dirty.jar -Dspring.config.additional-location=/Development/Projects/edm-zuul-proxy/config -Dserver.port=0 -Dloader.main=edu.uw.edm.CertificateManagementApplication org.springframework.boot.loader.PropertiesLauncher --certName=toto --uriRegex=/content/.\* --httpMethods=GET --httpMethods=POST --uwGroups=u_maximed --uwGroups=\*
+    java -cp build/libs/edm-zuul-proxy-1.111.0-detached-SNAPSHOT+dirty.jar -Dspring.profiles.active=your_user -Dspring.config.additional-location=/Development/Projects/edm-zuul-proxy/config -Dserver.port=0 -Dloader.main=edu.uw.edm.CertificateManagementApplication org.springframework.boot.loader.PropertiesLauncher --certName=toto --uriRegex=/content/.\* --httpMethods=GET --httpMethods=POST --uwGroups=u_maximed --uwGroups=\*

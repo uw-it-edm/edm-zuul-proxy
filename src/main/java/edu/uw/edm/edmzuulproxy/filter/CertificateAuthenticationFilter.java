@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -86,7 +88,7 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
 
 
     private void sendAuthorizationError(String certificateName, HttpMethod httpMethod, String uri, User user, RequestContext ctx) {
-        log.warn("certificate {} - {} is not allowed to access {} - {}", certificateName, user.getUsername(), httpMethod.name(), uri);
+        log.warn("certificate {} - {} is not allowed to access {} - {}", certificateName, user == null ? "anonymous" : user.getUsername(), httpMethod.name(), uri);
 
         ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
 
@@ -94,7 +96,11 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
     }
 
     private User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return ((User) principal);
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        } else {
+            return (User) authentication.getPrincipal();
+        }
     }
 }

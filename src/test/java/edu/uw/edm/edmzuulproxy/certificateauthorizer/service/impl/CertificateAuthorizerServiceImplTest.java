@@ -3,7 +3,6 @@ package edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl;
 import org.apache.commons.collections.iterators.CollatingIterator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,6 +24,7 @@ import edu.uw.edm.edmzuulproxy.security.User;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Maxime Deravet Date: 2019-01-29
@@ -34,22 +34,36 @@ import static org.junit.Assert.assertTrue;
 public class CertificateAuthorizerServiceImplTest {
 
     @MockBean(reset = MockReset.BEFORE)
-    CertificateAuthorizationRepository mockRepository;
+    private CertificateAuthorizationRepository mockRepository;
 
     @Autowired
-    CertificateAuthorizerService service;
-
-    @Autowired
-    CertificateAuthorizationRetriever certificateAuthorizationRetriever;
+    private CertificateAuthorizerService service;
 
 
     @Test
     public void whenNoRepoEntryThenUnauthorizedTest() {
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(CollatingIterator::new);
+        when(mockRepository.findByCertificateName("cert")).thenReturn(CollatingIterator::new);
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", new User("test", "", Collections.emptyList()));
 
         assertFalse("Shouldn't be allowed", allowedForUri);
+
+    }
+
+    @Test
+    public void allPathAuthorizedTest() {
+        final CertificateAuthorizationDAO auth = new CertificateAuthorizationDAO();
+        auth.setUriRegex(".*");
+        auth.setHttpMethods("*");
+        auth.setCertificateName("cert");
+        auth.setUwGroups("*");
+
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        final User user = new User("test", "", getListOfAuthorities("group4", "group5", "group_2"));
+
+        final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/zuul/my/uri", user);
+
+        assertTrue(allowedForUri);
 
     }
 
@@ -61,13 +75,14 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", null);
 
         assertTrue(allowedForUri);
 
     }
+
     @Test
     public void whenNoUserAndGroupsThenUnauthorizedTest() {
         final CertificateAuthorizationDAO auth = new CertificateAuthorizationDAO();
@@ -76,7 +91,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("group_1,group_2,group_3");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", null);
 
@@ -93,7 +108,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("group_1,group_2,group_3");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final User user = new User("test", "", getListOfAuthorities("group4", "group5", "group_2"));
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", user);
@@ -110,7 +125,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("group_1,group_2,group_3");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final User user = new User("test", "", getListOfAuthorities("group4", "group5", "group6"));
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", user);
@@ -132,7 +147,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", new User("test", "", Collections.emptyList()));
 
@@ -148,7 +163,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri/is", new User("test", "", Collections.emptyList()));
 
@@ -164,7 +179,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri/2234", new User("test", "", Collections.emptyList()));
 
@@ -180,7 +195,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri/is", new User("test", "", Collections.emptyList()));
 
@@ -201,7 +216,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth2.setCertificateName("cert");
         auth2.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Arrays.asList(auth1, auth2));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Arrays.asList(auth1, auth2));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", new User("test", "", Collections.emptyList()));
 
@@ -222,7 +237,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth2.setCertificateName("cert");
         auth2.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Arrays.asList(auth1, auth2));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Arrays.asList(auth1, auth2));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/your/uri", new User("test", "", Collections.emptyList()));
 
@@ -238,7 +253,7 @@ public class CertificateAuthorizerServiceImplTest {
         auth.setCertificateName("cert");
         auth.setUwGroups("*");
 
-        Mockito.when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
 
         final boolean allowedForUri = service.isAllowedForUri("cert", HttpMethod.GET, "/my/uri", new User("test", "", Collections.emptyList()));
 

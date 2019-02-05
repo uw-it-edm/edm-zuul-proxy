@@ -1,5 +1,4 @@
 FROM openjdk:8-slim as builder
-WORKDIR .
 
 
 #not ideal but as we are using build stages, the published image won't get these
