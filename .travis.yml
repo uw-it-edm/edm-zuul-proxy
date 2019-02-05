@@ -26,7 +26,6 @@ cache:
 
 before_install:
   - git checkout $(git branch --contains $(git rev-parse HEAD)|tail -n1|tr -d ' ') || true
-  - sudo apt-get install jq
   - wget -O ~/codacy-coverage-reporter-assembly-latest.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 
