@@ -43,10 +43,9 @@ jobs:
       jdk: openjdk8
       script: ./gradlew build artifactoryPublish -x test
       if: type = push
-
-after_success:
-  - ./gradlew jacocoTestReport coveralls
-  - java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
+    - stage: deploy
+      jdk: openjdk8
+      script: ./gradlew jacocoTestReport coveralls && java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
 
 notifications:
   email: false
