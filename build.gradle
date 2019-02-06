@@ -185,6 +185,7 @@ if (version.toString().contains("dirty")) {
 
 artifactoryPublish.dependsOn bootJar
 
+jacocoTestReport.dependsOn test
 //code coverage
 jacocoTestReport {
     reports {
