@@ -28,13 +28,13 @@ import static org.mockito.Mockito.when;
 public class UserProvisioningServiceImplTest {
 
     @Mock
-    AwsProperties awsProperties;
+    private AwsProperties awsProperties;
 
     @Mock
-    SecurityProperties securityProperties;
+    private SecurityProperties securityProperties;
 
     @Mock
-    AWSLambda awsLambdaClient;
+    private AWSLambda awsLambdaClient;
 
     UserProvisioningServiceImpl userProvisioningService;
 

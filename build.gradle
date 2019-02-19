@@ -1,7 +1,10 @@
 buildscript {
     ext {
         springBootVersion = '2.0.5.RELEASE'
-        springCloudReleaseTrain = 'Finchley.SR1'
+        springCloudReleaseTrain = 'Finchley.SR2'
+
+        springDataDynamoDBVersion = '5.0.4'
+        gwsClientVersion = "0.0.2"
     }
     repositories {
         jcenter()
@@ -13,7 +16,7 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
         classpath "edu.uw.concert:gradle-gitflow:0.3.0"
         classpath "gradle.plugin.com.gorylenko.gradle-git-properties:gradle-git-properties:1.5.2"
-        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.7.5")
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.8.1")
         classpath("nu.studer:gradle-credentials-plugin:1.0.4")
     }
 }
@@ -43,6 +46,8 @@ repositories {
 
 bootJar {
     baseName = 'edm-zuul-proxy'
+    mainClassName= 'edu.uw.edm.edmzuulproxy.EdmZuulProxyApplication'
+
 }
 task wrapper(type: Wrapper) {
     gradleVersion = '4.5.1'
@@ -56,6 +61,12 @@ dependencies {
     compile('com.amazonaws:aws-java-sdk-lambda')
     compile('org.springframework.boot:spring-boot-starter-cache')
     compile('com.github.ben-manes.caffeine:caffeine')
+
+    compile("com.github.derjust:spring-data-dynamodb:$springDataDynamoDBVersion")
+
+    compile("edu.uw.edm.gws:gws-client:$gwsClientVersion")
+    compile("edu.uw.edm.gws:gws-client-spring-boot-starter:$gwsClientVersion")
+
     runtime('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
     testCompile('org.springframework.boot:spring-boot-starter-test')
@@ -174,6 +185,7 @@ if (version.toString().contains("dirty")) {
 
 artifactoryPublish.dependsOn bootJar
 
+jacocoTestReport.dependsOn test
 //code coverage
 jacocoTestReport {
     reports {

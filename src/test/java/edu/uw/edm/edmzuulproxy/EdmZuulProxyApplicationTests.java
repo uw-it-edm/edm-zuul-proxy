@@ -11,6 +11,7 @@ public class EdmZuulProxyApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		//NOOP check if App can be started
 	}
 
 }
