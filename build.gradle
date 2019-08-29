@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.5.RELEASE'
+        springBootVersion = '2.0.9.RELEASE'
         springCloudReleaseTrain = 'Finchley.SR2'
 
         springDataDynamoDBVersion = '5.0.4'
@@ -66,6 +66,9 @@ dependencies {
 
     compile("edu.uw.edm.gws:gws-client:$gwsClientVersion")
     compile("edu.uw.edm.gws:gws-client-spring-boot-starter:$gwsClientVersion")
+
+    compile('io.micrometer:micrometer-registry-statsd')
+    runtime("org.pcollections:pcollections:3.0.1") // required for micrometer, expected fix in micrometer v1.0.6 (upgrading spring may fix this)
 
     runtime('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
