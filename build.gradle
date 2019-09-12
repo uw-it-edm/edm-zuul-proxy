@@ -3,7 +3,7 @@ buildscript {
         springBootVersion = '2.0.9.RELEASE'
         springCloudReleaseTrain = 'Finchley.SR2'
 
-        springDataDynamoDBVersion = '5.0.4'
+        springDataDynamoDBVersion = '5.1.0'
         gwsClientVersion = "0.0.2"
     }
     repositories {
