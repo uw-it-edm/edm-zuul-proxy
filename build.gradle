@@ -1,7 +1,7 @@
 buildscript {
     ext {
         springBootVersion = '2.0.9.RELEASE'
-        springCloudReleaseTrain = 'Finchley.SR2'
+        springCloudReleaseTrain = 'Greenwich.SR4'
 
         springDataDynamoDBVersion = '5.0.4'
         gwsClientVersion = "0.0.2"
