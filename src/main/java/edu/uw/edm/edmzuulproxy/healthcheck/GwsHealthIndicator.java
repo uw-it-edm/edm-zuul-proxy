@@ -26,7 +26,10 @@ public class GwsHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        String username = "edmsci"; // hardcode app user name for simplicity
+        // hardcode app user name for simplicity
+        // the value is not important here. Even an invalid netid would work.
+        // for an invalid netid, the call to GWS would succeed and return an empty list.
+        String username = "edmsci";
         try {
             List<GroupReference> groupsForUser = groupsWebServiceClient.getGroupsForUser(username, GWSSearchType.direct);
             return Health.up().build();
