@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GwsHealthIndicator implements HealthIndicator {
 
-    private GroupsWebServiceClient groupsWebServiceClient;
+    final private GroupsWebServiceClient groupsWebServiceClient;
 
     @Autowired
     public GwsHealthIndicator(GroupsWebServiceClient groupsWebServiceClient) {
