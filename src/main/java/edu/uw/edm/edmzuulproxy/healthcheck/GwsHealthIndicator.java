@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GwsHealthIndicator implements HealthIndicator {
 
-    private GroupsResolver groupsResolver;
+    private final GroupsResolver groupsResolver;
 
     @Autowired
     public GwsHealthIndicator(GroupsResolver groupsResolver) {
