@@ -13,6 +13,6 @@ uw:
 
 spring:
   cache:
-    cache-names: acs-users, authorized-uri
+    cache-names: acs-users, authorized-uri, user-groups, direct-user-groups
     caffeine:
       spec: maximumSize=1, expireAfterAccess=1m

@@ -8,8 +8,9 @@ import java.util.Collection;
  * @author Maxime Deravet Date: 2019-01-29
  */
 
-public interface  GroupsResolver {
+public interface GroupsResolver {
 
+    Collection<? extends GrantedAuthority> getGroupsForUser(String username);
 
-     Collection<? extends GrantedAuthority> getGroupsForUser(String username);
+    Collection<? extends GrantedAuthority> getGroupsForUserDirectMembership(String username);
 }
