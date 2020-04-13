@@ -1,5 +1,7 @@
 package edu.uw.edm.edmzuulproxy.security;
 
+import com.google.common.base.Preconditions;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,10 +15,12 @@ import java.util.stream.Collectors;
 import edu.uw.edm.gws.GroupsWebServiceClient;
 import edu.uw.edm.gws.model.GWSSearchType;
 import edu.uw.edm.gws.model.GroupReference;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Maxime Deravet Date: 2019-01-29
  */
+@Slf4j
 @Service
 public class GroupsResolverImpl implements GroupsResolver {
 
@@ -30,8 +34,23 @@ public class GroupsResolverImpl implements GroupsResolver {
     @Override
     @Cacheable(cacheNames = "user-groups")
     public Collection<? extends GrantedAuthority> getGroupsForUser(String username) {
+        Preconditions.checkNotNull(username, "A username is required for getGroupsForUser");
 
-        final List<GroupReference> groupsForUser = groupsWebServiceClient.getGroupsForUser(username, GWSSearchType.effective);
+        return this.getGroupsForUser(username, GWSSearchType.effective);
+    }
+
+    @Override
+    @Cacheable(cacheNames = "direct-user-groups")
+    public Collection<? extends GrantedAuthority> getGroupsForUserDirectMembership(String username) {
+        Preconditions.checkNotNull(username, "A username is required for getGroupsForUserDirectMembership");
+
+        return this.getGroupsForUser(username, GWSSearchType.direct);
+    }
+
+    private Collection<? extends GrantedAuthority> getGroupsForUser(String username, GWSSearchType searchType) {
+        log.debug("Calling GWS to get '{}' membership for the user '{}'", searchType, username);
+
+        final List<GroupReference> groupsForUser = groupsWebServiceClient.getGroupsForUser(username, searchType);
 
         return groupsForUser.stream().map(group -> new SimpleGrantedAuthority(group.getName())).collect(Collectors.toSet());
     }
