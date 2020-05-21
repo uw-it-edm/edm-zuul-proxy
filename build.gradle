@@ -9,7 +9,7 @@ buildscript {
     repositories {
         jcenter()
         mavenCentral()
-        maven { url 'http://dl.bintray.com/maximede/gradle-plugins' }
+        maven { url 'https://dl.bintray.com/maximede/gradle-plugins' }
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
@@ -68,7 +68,7 @@ dependencies {
     compile("edu.uw.edm.gws:gws-client-spring-boot-starter:$gwsClientVersion")
 
     compile('io.micrometer:micrometer-registry-statsd')
-    runtime("org.pcollections:pcollections:3.1.0") // required for micrometer, expected fix in micrometer v1.0.6 (upgrading spring may fix this)
+    runtime("org.pcollections:pcollections:3.1.3") // required for micrometer, expected fix in micrometer v1.0.6 (upgrading spring may fix this)
 
     runtime('org.springframework.boot:spring-boot-devtools')
     compileOnly('org.projectlombok:lombok')
@@ -104,7 +104,7 @@ publishing {
 
                 asNode().appendNode('repositories').appendNode('repository')
                         .appendNode('id', 'spring-releases').parent()
-                        .appendNode('url', 'http://repo.spring.io/libs-release')
+                        .appendNode('url', 'https://repo.spring.io/libs-release')
             }
         }
     }
