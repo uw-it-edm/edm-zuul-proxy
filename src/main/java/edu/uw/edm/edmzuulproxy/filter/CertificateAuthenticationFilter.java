@@ -19,6 +19,9 @@ import edu.uw.edm.edmzuulproxy.security.User;
 import lombok.extern.slf4j.Slf4j;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import static edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl.CertificateAuthorizerServiceImpl.PROFILES_SEPARATOR;
+
+import java.util.List;
 
 /**
  * @author Maxime Deravet Date: 2019-01-28
@@ -27,6 +30,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 public class CertificateAuthenticationFilter extends ZuulFilter {
 
+    private static final String AUTHORIZED_PROFILES_HEADER = "x-uw-authorized-profiles";
     public static final int CERTIFICATE_AUTHORIZATION_FILTER_ORDER = 2;
     private CertificateAuthorizerService certificateAuthorizerService;
     private CertificateAuthorizationProperties certificateAuthorizationProperties;
@@ -72,6 +76,11 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
                 sendAuthorizationError(certificateName, httpMethod, zuulRequestURI, user, ctx);
                 return null;
             }
+
+            final List<String> profiles = certificateAuthorizerService.getAuthorizedProfilesForUri(certificateName, zuulRequestURI);
+            final String profilesHeaderValue = profiles != null ? String.join(PROFILES_SEPARATOR, profiles) : "";
+            ctx.addZuulRequestHeader(AUTHORIZED_PROFILES_HEADER, profilesHeaderValue);
+
         } catch (Exception e) {
             log.error("Error running CertificateAuthenticationFilter: ", e);
 

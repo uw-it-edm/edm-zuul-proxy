@@ -26,6 +26,8 @@ import edu.uw.edm.edmzuulproxy.security.User;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.collection.IsIterableContainingInOrder.contains;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Maxime Deravet Date: 2019-01-29
@@ -264,4 +266,47 @@ public class CertificateAuthorizerServiceImplTest {
 
     }
 
+    @Test
+    public void shouldReturnDistinctListOfProfiles() {
+        final CertificateAuthorizationDAO auth = new CertificateAuthorizationDAO();
+        auth.setUriRegex("/my/uri");
+        auth.setCertificateName("cert");
+        auth.setHttpMethods("*");
+        auth.setUwGroups("*");
+        auth.setAuthorizedProfiles("TestProfile1, TestProfile2,  testprofile1    ");
+
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Collections.singletonList(auth));
+
+        final List<String> profiles = service.getAuthorizedProfilesForUri("cert", "/my/uri");
+
+        assertThat(profiles, contains("testprofile1", "testprofile2"));
+    }
+
+    @Test
+    public void shouldReturnProfilesOnlyFromMatchedUri() {
+        final CertificateAuthorizationDAO auth1 = new CertificateAuthorizationDAO();
+        auth1.setUriRegex("/first/uri");
+        auth1.setCertificateName("cert");
+        auth1.setHttpMethods("*");
+        auth1.setUwGroups("*");
+        auth1.setAuthorizedProfiles("TestProfile1");
+
+        final CertificateAuthorizationDAO auth2 = new CertificateAuthorizationDAO();
+        auth2.setUriRegex("/second/uri");
+        auth2.setCertificateName("cert");
+        auth2.setHttpMethods("*");
+        auth2.setUwGroups("*");
+        auth2.setAuthorizedProfiles("TestProfile2");
+
+        when(mockRepository.findByCertificateName("cert")).thenReturn(Arrays.asList(auth1, auth2));
+
+        List<String> profiles = service.getAuthorizedProfilesForUri("cert", "/first/uri");
+        assertThat(profiles, contains("testprofile1"));
+
+        profiles = service.getAuthorizedProfilesForUri("cert", "/second/uri");
+        assertThat(profiles, contains("testprofile2"));
+
+        profiles = service.getAuthorizedProfilesForUri("cert", "/third/uri");
+        assertTrue(profiles.isEmpty());
+    }
 }

@@ -16,4 +16,5 @@ public class CompiledCertificateAuthorization {
     private Pattern uriRegex;
     private List<String> httpMethods;
     private List<String> uwGroups;
+    private List<String> authorizedProfiles;
 }

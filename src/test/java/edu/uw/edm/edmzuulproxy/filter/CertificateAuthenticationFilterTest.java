@@ -1,5 +1,6 @@
 package edu.uw.edm.edmzuulproxy.filter;
 
+import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 
 import org.junit.After;
@@ -75,7 +76,7 @@ public class CertificateAuthenticationFilterTest {
     }
 
     @Test
-    public void shoudlWorkWithAnonymousUserTest() {
+    public void shouldWorkWithAnonymousUserTest() {
         mockHttpServletRequest.setRequestURI("/my/uri");
         mockHttpServletRequest.setMethod("GET");
         mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
@@ -169,6 +170,37 @@ public class CertificateAuthenticationFilterTest {
 
     }
 
+    @Test
+    public void shouldAddAuthorizedProfilesHeaderToRequest() {
+        mockHttpServletRequest.setRequestURI("/my/uri");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
+
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        final String header = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-uw-authorized-profiles");
+        assertThat(header, is("testprofile1,testprofile2"));
+    }
+
+    @Test
+    public void shouldAddEmptyAuthorizedProfilesHeaderIfNoneDefined() {
+        mockHttpServletRequest.setRequestURI("/my/uri");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(null);
+
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        final String header = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-uw-authorized-profiles");
+        assertTrue(header.isEmpty());
+    }
 
     private CertificateAuthenticationFilter newFilter() {
         return new CertificateAuthenticationFilter(certificateAuthorizerService, certificateAuthorizationProperties, new ProxyRequestHelper(new ZuulProperties()));

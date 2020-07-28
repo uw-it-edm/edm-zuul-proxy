@@ -6,6 +6,7 @@ application.pid
 
 out/
 classes/
+bin/
 
 ### STS ###
 .apt_generated
@@ -17,6 +18,7 @@ classes/
 .sts4-cache
 
 ### IntelliJ IDEA ###
+.vscode/
 .idea
 *.iws
 *.iml
