@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.CertificateAuthorizationRepository;
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CompiledCertificateAuthorization;
@@ -31,7 +33,7 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
     public static final String UW_GROUPS_SEPARATOR = DEFAULT_SEPARATOR;
     public static final String HTTP_METHODS_SEPARATOR = DEFAULT_SEPARATOR;
     public static final String CONTACT_EMAILS_SEPARATOR = DEFAULT_SEPARATOR;
-
+    public static final String PROFILES_SEPARATOR = DEFAULT_SEPARATOR;
 
     private CertificateAuthorizationRetriever certificateAuthorizationRetriever;
     private CertificateAuthorizationRepository certificateAuthorizationRepository;
@@ -57,6 +59,22 @@ public class CertificateAuthorizerServiceImpl implements CertificateAuthorizerSe
         }
 
         return false;
+    }
+
+    @Override
+    @Cacheable(cacheNames = "authorized-profiles-uri")
+    public List<String> getAuthorizedProfilesForUri(String certificateName, String uri) {
+      log.debug("Retrieving authorized profiles for cert {} to access uri {}", certificateName, uri);
+
+      final Iterable<CompiledCertificateAuthorization> byCertificateName = certificateAuthorizationRetriever.findByCertificateName(certificateName);
+
+      return StreamSupport
+                .stream(byCertificateName.spliterator(), false)
+                .filter(entry -> uriIsAuthorized(uri, entry))
+                .flatMap(entry -> entry.getAuthorizedProfiles().stream())
+                .map(profile -> profile.toLowerCase().trim())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private boolean isAuthorizedForRequest(CompiledCertificateAuthorization certificateAuthorizationDAO, HttpMethod httpMethod, String uri, User user) {

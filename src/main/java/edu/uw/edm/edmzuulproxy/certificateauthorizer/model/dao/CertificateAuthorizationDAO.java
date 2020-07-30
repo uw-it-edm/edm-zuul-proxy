@@ -52,6 +52,11 @@ public class CertificateAuthorizationDAO {
     @Setter
     private String notes;
 
+    @DynamoDBAttribute
+    @Getter
+    @Setter
+    private String authorizedProfiles;
+
     @DynamoDBHashKey(attributeName = "certificateName")
     public String getCertificateName() {
         return certificateAuthorizationId != null ? certificateAuthorizationId.getCertificateName() : null;
