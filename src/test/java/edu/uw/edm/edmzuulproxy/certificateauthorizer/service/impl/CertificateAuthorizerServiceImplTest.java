@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.CertificateAuthorizationRepository;
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.CertificateAuthorizationDAO;
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.service.CertificateAuthorizerService;
-import edu.uw.edm.edmzuulproxy.properties.CertificateAuthorizationProperties;
 import edu.uw.edm.edmzuulproxy.security.User;
 
 import static org.junit.Assert.assertFalse;
@@ -35,8 +34,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = "spring.cache.type=NONE")
 public class CertificateAuthorizerServiceImplTest {
-    @MockBean
-    private CertificateAuthorizationProperties mockCertificateAuthorizationProperties;
 
     @MockBean(reset = MockReset.BEFORE)
     private CertificateAuthorizationRepository mockRepository;
