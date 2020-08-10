@@ -19,6 +19,7 @@ import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.CompiledCertificateAu
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.model.dao.CertificateAuthorizationDAO;
 
 import static edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl.CertificateAuthorizerServiceImpl.UW_GROUPS_SEPARATOR;
+import static edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl.CertificateAuthorizerServiceImpl.PROFILES_SEPARATOR;
 
 /**
  * @author Maxime Deravet Date: 2019-01-30
@@ -57,9 +58,8 @@ public class CertificateAuthorizationRetriever {
                 .uriRegex(Pattern.compile(certificateAuthorizationDAO.getUriRegex()))
                 .httpMethods(toHttpMethodList(certificateAuthorizationDAO.getHttpMethods()))
                 .uwGroups(toGroupList(certificateAuthorizationDAO.getUwGroups()))
+                .authorizedProfiles(toProfileList(certificateAuthorizationDAO.getAuthorizedProfiles()))
                 .build();
-
-
     }
 
     private List<String> toHttpMethodList(String httpMethodsList) {
@@ -73,5 +73,10 @@ public class CertificateAuthorizationRetriever {
         return Arrays.asList(groupsList.split(UW_GROUPS_SEPARATOR));
     }
 
-
+    private List<String> toProfileList(String profileList) {
+        if (profileList == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.asList(profileList.split(PROFILES_SEPARATOR));
+    }
 }
