@@ -4,7 +4,7 @@ buildscript {
         springCloudReleaseTrain = 'Finchley.SR2'
 
         springDataDynamoDBVersion = '5.0.4'
-        gwsClientVersion = "0.0.2"
+        gwsClientVersion = "1.0.0"
     }
     repositories {
         jcenter()
