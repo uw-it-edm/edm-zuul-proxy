@@ -5,36 +5,31 @@ zuul:
     default:
       path: /**
       url: http://localhost:12345/
-# If you want to disable the user sync filter
-#  AcsUserSyncFilter:
-#    pre:
-#      disable: true
-logging:
-  level:
-    edu: TRACE
+  CertificateAuthenticationFilter:
+    pre:
+      disable: False
 
 gws:
   keystoreLocation: /keystore/location
   keystorePassword: password
 
 spring:
+  pid:
+    fail-on-write-error: false
   cache:
-      cache-names: acs-users, authorized-uri, user-groups, cert-retriever
-      caffeine:
-          spec: maximumSize=1000, expireAfterAccess=600s
+    type: none
 
 uw:
   cert-authentication:
     certificateNameHeader: X_CERTIFICATE_SUBJECT_NAME
   aws:
-    dynamoTableNamePrefix: example-temp-
     dynamoDBEndpointOverride: http://localhost:8123
     dynamoDBCreateTable: true
     region: us-west-2
     acsUserSyncFunctionName: acs-user-sync-function-name
   profile:
     security:
-      authentication-header-name: auth-header
+      authentication-header-name: x-uw-act-as
 
 ribbon:
   eureka:

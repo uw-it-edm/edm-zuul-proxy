@@ -5,18 +5,81 @@
 develop: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?branch=develop)](https://travis-ci.org/uw-it-edm/edm-zuul-proxy) [![Coverage Status](https://coveralls.io/repos/github/uw-it-edm/edm-zuul-proxy/badge.svg?branch=develop)](https://coveralls.io/github/uw-it-edm/edm-zuul-proxy?branch=develop)
 master: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?branch=master)](https://travis-ci.org/uw-it-edm/edm-zuul-proxy) [![Coverage Status](https://coveralls.io/repos/github/uw-it-edm/edm-zuul-proxy/badge.svg?branch=master)](https://coveralls.io/github/uw-it-edm/edm-zuul-proxy?branch=master)
 
+# Setup for Local Developement
 
-## Run Locally
-
-Use docker to boot a fake dynamodb 
-    
+## Step local DynamoDB
+- Use docker to boot a fake dynamodb 
+    ```
     docker run -p 8123:8000 -it --rm instructure/dynamo-local-admin
+    ```
 
-You'll find a db ui at http://localhost:8123/
+- Navigate to DB ui at http://localhost:8123/
+
+- (Using UI) Create a table whithin the UI with 'Name'=`edm-zuul-proxy-certificate-authorization` and 'Hash Attribute Name'=`certificateName`.
+
+- (Using UI) Create an item in the new table with:
+    ```
+    {
+        "authorizedProfiles": "*",
+        "certificateName": "uwitconcert-dev.s.uw.edu",
+        "httpMethods": "*",
+        "methodAndURI": "* .*",
+        "notes": "Local test",
+        "uriRegex": ".*",
+        "uwGroups": "*"
+    }
+    ```
+
+## Setup local forwarding server
+
+The goal of edm-zuul-proxy is to forward requests to different end-points (called routes by zuul). To simplify testing a server is setup that will receive and 'echo' the requests back to the caller.
+
+```
+npx http-echo-server 12345
+```
+
+## Run local zuul proxy
+
+- Copy contents of `config/application-example.yml` into a new file `config/application-local.yml`.
+- Update setting `gws.keystoreLocation` with local path to your .jks file.
+- Update setting `gws.keystorePassword` with the password of the .jks file.
+- Run the project specifying the location of `config/application-local.yml` file. For example:
+    ```
+    SPRING_CONFIG_LOCATION=./config/application-local.yml ./gradlew bootRun
+    ```
 
 
+## Test local server
 
-## CertificateManagement CLI
+To test the server, make sure to provide a certificate name in the `X_CERTIFICATE_SUBJECT_NAME` header that matches the certificate that was entered in the DynamoDB table and a valid NetId for the `x-uw-act-as` header. (Note: both header names can be configured in the .yml file).
+
+### Sample Request:
+```
+curl --location --request GET 'http://localhost:8080/test' \
+--header 'X_CERTIFICATE_SUBJECT_NAME: uwitconcert-dev.s.uw.edu' \
+--header 'x-uw-act-as: <YOUR_NET_ID>'
+```
+
+### Sample Response:
+If everything is setup correctly, Zuul proxy will forward the request to http://localhost:12345/test, which will be echoed back by the http-echo-server. The response should be something like:
+```
+GET /test HTTP/1.1
+user-agent: curl/7.64.1
+accept: */*
+x_certificate_subject_name: uwitconcert-dev.s.uw.edu
+x-uw-act-as: YOUR_NET_ID
+x-uw-authorized-profiles: *
+x-forwarded-host: localhost:8080
+x-forwarded-proto: http
+x-forwarded-port: 8080
+x-forwarded-for: 0:0:0:0:0:0:0:1
+Accept-Encoding: gzip
+Host: localhost:12345
+Connection: Keep-Alive
+```
+
+
+## (OLD) CertificateManagement CLI
 
 This will allow you to create a new entry in the dynamodb table
 
