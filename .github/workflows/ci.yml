@@ -36,6 +36,5 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_USERNAME: edm-zuul-proxy Build Alert
           SLACK_TITLE: edm-zuul-proxy Build Alert
           SLACK_COLOR: '#ff0000'
