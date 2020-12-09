@@ -31,6 +31,8 @@ jobs:
         run: ./gradlew build
       - name: Deploy artifacts
         run: ./gradlew build artifactoryPublish -x test
+      - name: Report Code Coverage
+        run: ./gradlew jacocoTestReport coveralls && java -jar ~/codacy-coverage-reporter-assembly-latest.jar report -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
       - name: Slack Notification
         if: ${{ failure() }}
         uses: rtCamp/action-slack-notify@v2
