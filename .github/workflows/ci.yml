@@ -38,3 +38,6 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_TITLE: edm-zuul-proxy Build Alert
           SLACK_COLOR: '#ff0000'
+
+
+          
