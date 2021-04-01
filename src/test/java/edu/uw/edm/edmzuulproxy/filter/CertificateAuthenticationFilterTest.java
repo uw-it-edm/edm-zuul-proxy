@@ -230,10 +230,10 @@ public class CertificateAuthenticationFilterTest {
 
 
     @Test
-    public void shouldNotAddDocfinityHeaderToRequestForCert() {
+    public void shouldNotAddDocfinityHeaderToRequestForUnknownCert() {
         mockHttpServletRequest.setRequestURI("/docfinity/webservices/rest/metadata");
         mockHttpServletRequest.setMethod("GET");
-        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert1");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "unknownCert");
 
         when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
         when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
@@ -250,7 +250,7 @@ public class CertificateAuthenticationFilterTest {
     }
 
     @Test
-    public void shouldNotAddDocfinityHeaderToRequestForUri() {
+    public void shouldNotAddDocfinityHeaderToRequestForNonDocFinityUri() {
         mockHttpServletRequest.setRequestURI("/data/webservices/rest/metadata");
         mockHttpServletRequest.setMethod("GET");
         mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
