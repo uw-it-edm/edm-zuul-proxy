@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.HashMap;
 
 import edu.uw.edm.edmzuulproxy.certificateauthorizer.service.CertificateAuthorizerService;
 import edu.uw.edm.edmzuulproxy.properties.CertificateAuthorizationProperties;
@@ -28,6 +30,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -49,6 +52,9 @@ public class CertificateAuthenticationFilterTest {
     public void initMocks() {
         certificateAuthorizerService = mock(CertificateAuthorizerService.class);
         certificateAuthorizationProperties = new CertificateAuthorizationProperties(CERTIFICATE_NAME_HEADER);
+        Map<String, String> myMap = new HashMap();
+        myMap.put("mycert", "apikey");
+        certificateAuthorizationProperties.setCertificateToApiKeyMap(myMap);
     }
 
     @Before
@@ -200,6 +206,67 @@ public class CertificateAuthenticationFilterTest {
 
         final String header = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-uw-authorized-profiles");
         assertTrue(header.isEmpty());
+    }
+
+    @Test
+    public void shouldAddDocfinityHeaderToRequest() {
+        mockHttpServletRequest.setRequestURI("/docfinity/webservices/rest/metadata");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
+
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        final String authHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("authorization");
+        final String tokenHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-xsrf-token");
+        final String cookieHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("cookie");
+        assertThat(authHeader, is("Bearer apikey"));
+        assertThat(tokenHeader, is("edm-token"));
+        assertThat(cookieHeader, is("xsrf-token=edm-token"));
+    }
+
+
+    @Test
+    public void shouldNotAddDocfinityHeaderToRequestForUnknownCert() {
+        mockHttpServletRequest.setRequestURI("/docfinity/webservices/rest/metadata");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "unknownCert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
+
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        final String authHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("authorization");
+        final String tokenHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-xsrf-token");
+        final String cookieHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("cookie");
+        assertNull(authHeader);
+        assertNull(tokenHeader);
+        assertNull(cookieHeader);
+    }
+
+    @Test
+    public void shouldNotAddDocfinityHeaderToRequestForNonDocFinityUri() {
+        mockHttpServletRequest.setRequestURI("/data/webservices/rest/metadata");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
+
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        final String authHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("authorization");
+        final String tokenHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-xsrf-token");
+        final String cookieHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("cookie");
+        assertNull(authHeader);
+        assertNull(tokenHeader);
+        assertNull(cookieHeader);
     }
 
     private CertificateAuthenticationFilter newFilter() {

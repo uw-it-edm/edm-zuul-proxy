@@ -22,6 +22,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static edu.uw.edm.edmzuulproxy.certificateauthorizer.service.impl.CertificateAuthorizerServiceImpl.PROFILES_SEPARATOR;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Maxime Deravet Date: 2019-01-28
@@ -31,6 +32,11 @@ import java.util.List;
 public class CertificateAuthenticationFilter extends ZuulFilter {
 
     private static final String AUTHORIZED_PROFILES_HEADER = "x-uw-authorized-profiles";
+    private static final String AUTHORIZATION_HEADER = "authorization";
+    private static final String COOKIE_HEADER = "cookie";
+    private static final String COOKIE_VALUE = "xsrf-token=edm-token";
+    private static final String X_XSRF_TOKEN_HEADER = "x-xsrf-token";
+    private static final String X_XSRF_TOKEN_VALUE = "edm-token";
     public static final int CERTIFICATE_AUTHORIZATION_FILTER_ORDER = 2;
     private CertificateAuthorizerService certificateAuthorizerService;
     private CertificateAuthorizationProperties certificateAuthorizationProperties;
@@ -71,6 +77,7 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
             final String certificateName = getCertificateName(ctx);
             final HttpMethod httpMethod = HttpMethod.valueOf(ctx.getRequest().getMethod());
             final boolean allowedForUri = certificateAuthorizerService.isAllowedForUri(certificateName, httpMethod, zuulRequestURI, user);
+            final Map<String, String> certificateToApiKeyMap = certificateAuthorizationProperties.getCertificateToApiKeyMap();
 
             if (!allowedForUri) {
                 sendAuthorizationError(certificateName, httpMethod, zuulRequestURI, user, ctx);
@@ -80,6 +87,14 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
             final List<String> profiles = certificateAuthorizerService.getAuthorizedProfilesForUri(certificateName, zuulRequestURI);
             final String profilesHeaderValue = profiles != null ? String.join(PROFILES_SEPARATOR, profiles) : "";
             ctx.addZuulRequestHeader(AUTHORIZED_PROFILES_HEADER, profilesHeaderValue);
+
+            if (   certificateToApiKeyMap != null && certificateToApiKeyMap.containsKey(certificateName)
+                && zuulRequestURI != null && zuulRequestURI.startsWith("/docfinity/") ) {
+                String apiKey = certificateToApiKeyMap.get(certificateName);
+                ctx.addZuulRequestHeader(AUTHORIZATION_HEADER, "Bearer " + apiKey);
+                ctx.addZuulRequestHeader(X_XSRF_TOKEN_HEADER, X_XSRF_TOKEN_VALUE);
+                ctx.addZuulRequestHeader(COOKIE_HEADER, COOKIE_VALUE);
+            }
 
         } catch (Exception e) {
             log.error("Error running CertificateAuthenticationFilter: ", e);
