@@ -17,8 +17,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertThat;
 
 public class DocFinityAuditUserFilterTest {
-    private static final String DOCFINITY_HEADER = "x-audituser";
-
     private MockHttpServletRequest mockHttpServletRequest;
     private MockHttpServletResponse mockHttpServletResponse;
     private DocFinityAuditUserFilter filter;
@@ -68,7 +66,19 @@ public class DocFinityAuditUserFilterTest {
     @Test
     public void shouldSucceedIfHeaderIsPresent() throws Exception {
         // arrange
-        mockHttpServletRequest.addHeader(DOCFINITY_HEADER, "someuser");
+        mockHttpServletRequest.addHeader("x-audituser", "someuser");
+
+        // act
+        filter.run();
+
+        // assert
+        assertThat(mockHttpServletResponse.getStatus(), is(200));
+    }
+
+    @Test
+    public void shouldSucceedIfHeaderIsPresentWithMixedCasing() throws Exception {
+        // arrange
+        mockHttpServletRequest.addHeader("x-AUDITUSER", "someuser");
 
         // act
         filter.run();
@@ -79,6 +89,20 @@ public class DocFinityAuditUserFilterTest {
 
     @Test
     public void shouldFailIfHeaderIsAbsent() throws Exception {
+        // act
+        filter.run();
+
+        // assert
+        assertThat(mockHttpServletResponse.getStatus(), is(400));
+        assertEquals("Header 'x-audituser' is required for requests to '/docfinity'.",
+                    RequestContext.getCurrentContext().getResponseBody());
+    }
+
+    @Test
+    public void shouldFailIfHeaderIsPresentWithMissingValue() throws Exception {
+        // arrange
+        mockHttpServletRequest.addHeader("x-audituser", "");
+
         // act
         filter.run();
 
