@@ -51,11 +51,11 @@ public class DocFinityAuditUserFilterTest {
         assertFalse(filter.shouldFilter());
 
         // test docfinity
-        mockHttpServletRequest.setRequestURI("/docfinity");
+        mockHttpServletRequest.setRequestURI("/docfinity/");
         assertTrue(filter.shouldFilter());
 
         // test docfinity with casing
-        mockHttpServletRequest.setRequestURI("/DOCFINITY");
+        mockHttpServletRequest.setRequestURI("/DOCFINITY/");
         assertTrue(filter.shouldFilter());
 
         // test docfinity with deep url
@@ -94,7 +94,7 @@ public class DocFinityAuditUserFilterTest {
 
         // assert
         assertThat(mockHttpServletResponse.getStatus(), is(400));
-        assertEquals("Header 'x-audituser' is required for requests to '/docfinity'.",
+        assertEquals("Header 'x-audituser' is required for requests to '/docfinity/'.",
                     RequestContext.getCurrentContext().getResponseBody());
     }
 
@@ -108,7 +108,7 @@ public class DocFinityAuditUserFilterTest {
 
         // assert
         assertThat(mockHttpServletResponse.getStatus(), is(400));
-        assertEquals("Header 'x-audituser' is required for requests to '/docfinity'.",
+        assertEquals("Header 'x-audituser' is required for requests to '/docfinity/'.",
                     RequestContext.getCurrentContext().getResponseBody());
     }
 }
