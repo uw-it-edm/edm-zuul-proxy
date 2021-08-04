@@ -21,7 +21,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Slf4j
 @Component
 public class DocFinityAuditUserFilter extends ZuulFilter {
-    private static final String DOCFINITY_URI_PREFIX = "/docfinity";
+    private static final String DOCFINITY_URI_PREFIX = "/docfinity/";
 
     private final String headerName;
 
