@@ -35,6 +35,7 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
     private static final String AUTHORIZATION_HEADER = "authorization";
     private static final String COOKIE_HEADER = "cookie";
     private static final String COOKIE_VALUE = "xsrf-token=edm-token";
+    private static final String X_API_KEY_HEADER = "x-api-key";
     private static final String X_XSRF_TOKEN_HEADER = "x-xsrf-token";
     private static final String X_XSRF_TOKEN_VALUE = "edm-token";
     public static final int CERTIFICATE_AUTHORIZATION_FILTER_ORDER = 2;
@@ -89,11 +90,15 @@ public class CertificateAuthenticationFilter extends ZuulFilter {
             ctx.addZuulRequestHeader(AUTHORIZED_PROFILES_HEADER, profilesHeaderValue);
 
             if (   certificateToApiKeyMap != null && certificateToApiKeyMap.containsKey(certificateName)
-                && zuulRequestURI != null && zuulRequestURI.startsWith("/docfinity/") ) {
+                && zuulRequestURI != null) {
                 String apiKey = certificateToApiKeyMap.get(certificateName);
-                ctx.addZuulRequestHeader(AUTHORIZATION_HEADER, "Bearer " + apiKey);
-                ctx.addZuulRequestHeader(X_XSRF_TOKEN_HEADER, X_XSRF_TOKEN_VALUE);
-                ctx.addZuulRequestHeader(COOKIE_HEADER, COOKIE_VALUE);
+                if (zuulRequestURI.startsWith("/docfinity/")) {
+                    ctx.addZuulRequestHeader(AUTHORIZATION_HEADER, "Bearer " + apiKey);
+                    ctx.addZuulRequestHeader(X_XSRF_TOKEN_HEADER, X_XSRF_TOKEN_VALUE);
+                    ctx.addZuulRequestHeader(COOKIE_HEADER, COOKIE_VALUE);
+                } else if (zuulRequestURI.startsWith("/documents/")) {
+                    ctx.addZuulRequestHeader(X_API_KEY_HEADER, apiKey);
+                }
             }
 
         } catch (Exception e) {
