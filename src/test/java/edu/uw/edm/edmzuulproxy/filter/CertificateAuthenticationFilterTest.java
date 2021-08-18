@@ -228,6 +228,24 @@ public class CertificateAuthenticationFilterTest {
         assertThat(cookieHeader, is("xsrf-token=edm-token"));
     }
 
+    @Test
+    public void shouldAddDocfinityHeaderWhenRequestForDocumentApi() {
+        // arrange
+        mockHttpServletRequest.setRequestURI("/documents/create");
+        mockHttpServletRequest.setMethod("GET");
+        mockHttpServletRequest.addHeader(CERTIFICATE_NAME_HEADER, "mycert");
+
+        when(certificateAuthorizerService.isAllowedForUri(any(), any(), any(), any())).thenReturn(true);
+        when(certificateAuthorizerService.getAuthorizedProfilesForUri(any(), any())).thenReturn(Lists.newArrayList("testprofile1", "testprofile2"));
+
+        // act
+        CertificateAuthenticationFilter filter = newFilter();
+        filter.run();
+
+        // assert
+        final String apiKeyHeader = RequestContext.getCurrentContext().getZuulRequestHeaders().get("x-api-key");
+        assertThat(apiKeyHeader, is("apikey"));
+    }
 
     @Test
     public void shouldNotAddDocfinityHeaderToRequestForUnknownCert() {
