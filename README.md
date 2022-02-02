@@ -15,7 +15,7 @@ master: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?bran
 
 - Navigate to DB ui at http://localhost:8123/
 
-- (Using UI) Create a table whithin the UI with 'Name'=`edm-zuul-proxy-certificate-authorization` and 'Hash Attribute Name'=`certificateName`.
+- (Using UI) Create a table whithin the UI with 'Name'=`edm-zuul-proxy-certificate-authorization`, 'Hash Attribute Name'=`certificateName`, 'Range Attribute Name'=`methodAndURI` and 'Range Attribute Type'=`String`.
 
 - (Using UI) Create an item in the new table with:
     ```
