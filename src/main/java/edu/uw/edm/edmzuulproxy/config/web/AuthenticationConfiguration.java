@@ -46,6 +46,7 @@ public class AuthenticationConfiguration {
                         .allowedOrigins("*")
                         .allowedMethods("*")
                         .allowedHeaders(securityProperties.getAuthenticationHeaderName())
+                        .allowedHeaders(securityProperties.getDocfinityAuthenticationHeaderName())
                         .allowCredentials(false).maxAge(3600);
             }
         };
@@ -82,7 +83,17 @@ public class AuthenticationConfiguration {
             http.sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-            http.addFilterBefore(requestHeaderAuthenticationFilter(),
+            /**
+             * The intent is for 'x-audituser' to take precedence as the authentication header, so if a
+             * request also has the 'x-uw-act-as' header (potentially added by mistake) the 'x-audituser'
+             * will be used for authentication. See CAB-4314.
+             */
+            http.addFilterBefore(
+                    requestHeaderAuthenticationFilter(securityProperties.getDocfinityAuthenticationHeaderName()),
+                    UsernamePasswordAuthenticationFilter.class);
+            
+            http.addFilterBefore(
+                    requestHeaderAuthenticationFilter(securityProperties.getAuthenticationHeaderName()),
                     UsernamePasswordAuthenticationFilter.class);
 
             http.headers().frameOptions().disable();
@@ -94,9 +105,10 @@ public class AuthenticationConfiguration {
             authenticationManagerBuilder.authenticationProvider(authenticationProvider);
         }
 
-        public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter() throws Exception {
+        public RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter(String authenticationHeaderName) throws Exception {
             RequestHeaderAuthenticationFilter requestHeaderAuthenticationFilter = new RequestHeaderAuthenticationFilter();
-            requestHeaderAuthenticationFilter.setPrincipalRequestHeader(securityProperties.getAuthenticationHeaderName());
+
+            requestHeaderAuthenticationFilter.setPrincipalRequestHeader(authenticationHeaderName);
             requestHeaderAuthenticationFilter.setAuthenticationManager(authenticationManager());
 
             requestHeaderAuthenticationFilter.setExceptionIfHeaderMissing(false);

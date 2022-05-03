@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Map;
+
 /**
  * @author Maxime Deravet Date: 2019-01-29
  */
@@ -21,4 +23,6 @@ public class CertificateAuthorizationProperties {
 
     @NonNull
     private String certificateNameHeader;
+
+    private Map<String, String> certificateToApiKeyMap;
 }
