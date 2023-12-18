@@ -44,12 +44,12 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
 
     // see https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry
-    // store the personal access token (PAT) in the env variable "TOKEN"
+    // store the personal access token (PAT) in the env variable "GITHUB_PAT"
     maven {
         url = uri("https://maven.pkg.github.com/uw-it-edm/gws-client")
         credentials {
             username = project.findProperty("gpr.user") ?: System.getenv("USER")
-            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_PAT")
         }
     }
 }
@@ -105,7 +105,7 @@ publishing {
             url = "https://maven.pkg.github.com/uw-it-edm/edm-zuul-proxy"
             credentials {
                 username = System.getenv("GITHUB_ACTOR") ?: System.getenv("USER")
-                password = System.getenv("GITHUB_TOKEN") ?: System.getenv("TOKEN")
+                password = System.getenv("GITHUB_TOKEN") ?: System.getenv("GITHUB_PAT")
             }
         }
     }

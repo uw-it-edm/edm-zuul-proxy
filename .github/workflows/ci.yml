@@ -5,13 +5,6 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ARTIFACTORY_RELEASE_REPO: eaiw-release-local
-      ARTIFACTORY_RESOLVE_REPO: eaiw-local
-      ARTIFACTORY_SNAPSHOT_REPO: eaiw-snapshot-local
-      ARTIFACTORY_CONTEXT: ${{ secrets.ARTIFACTORY_CONTEXT }}
-      ARTIFACTORY_PUBLISH_USER: ${{ secrets.ARTIFACTORY_PUBLISH_USER }}
-      ARTIFACTORY_PUBLISH_PASSWORD: ${{ secrets.ARTIFACTORY_PUBLISH_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
@@ -30,8 +23,8 @@ jobs:
       - name: Build and test artifacts
         run: ./gradlew build
         env:
-          USER: 'uw-it-edm-bot'
-          TOKEN: ${{ secrets.EDM_GITHUB_ACCESS_PAT }}
+          USER: ${{ secrets.EDM_GITHUB_USER }}
+          GITHUB_PAT: ${{ secrets.EDM_GITHUB_PAT }}
       - name: Publish package to github packages
         uses: gradle/gradle-build-action@v2
         with:

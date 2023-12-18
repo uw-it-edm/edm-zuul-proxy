@@ -10,7 +10,7 @@ master: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?bran
 A PAT is required to access github packages from your local machine.
 - Create your (classic) PAT, if not done so already. See [managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for details.
 - Authorize your PAT. See [authorizing personal access token](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on) for details.
-- Store your PAT in the env variable TOKEN
+- Store your PAT in the env variable GITHUB_PAT
 
 ## Step local DynamoDB
 - Use docker to boot a fake dynamodb 
