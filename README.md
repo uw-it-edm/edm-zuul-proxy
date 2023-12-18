@@ -6,6 +6,11 @@ develop: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?bra
 master: [![Build Status](https://travis-ci.org/uw-it-edm/edm-zuul-proxy.svg?branch=master)](https://travis-ci.org/uw-it-edm/edm-zuul-proxy) [![Coverage Status](https://coveralls.io/repos/github/uw-it-edm/edm-zuul-proxy/badge.svg?branch=master)](https://coveralls.io/github/uw-it-edm/edm-zuul-proxy?branch=master)
 
 # Setup for Local Developement
+## Set up Personal Access Token (PAT)
+A PAT is required to access github packages from your local machine.
+- Create your (classic) PAT, if not done so already. See [managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for details.
+- Authorize your PAT. See [authorizing personal access token](https://docs.github.com/en/enterprise-cloud@latest/authentication/authenticating-with-saml-single-sign-on/authorizing-a-personal-access-token-for-use-with-saml-single-sign-on) for details.
+- Store your PAT in the env variable GITHUB_PAT
 
 ## Step local DynamoDB
 - Use docker to boot a fake dynamodb 

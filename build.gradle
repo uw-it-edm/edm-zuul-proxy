@@ -4,7 +4,7 @@ buildscript {
         springCloudReleaseTrain = 'Finchley.SR2'
 
         springDataDynamoDBVersion = '5.0.4'
-        gwsClientVersion = "1.1.0"
+        gwsClientVersion = "1.1.1"
     }
     repositories {
         jcenter()
@@ -42,6 +42,16 @@ sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     maven { url "https://repo.spring.io/milestone" }
+
+    // see https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry
+    // store the personal access token (PAT) in the env variable "GITHUB_PAT"
+    maven {
+        url = uri("https://maven.pkg.github.com/uw-it-edm/gws-client")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USER")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_PAT")
+        }
+    }
 }
 
 bootJar {
@@ -89,6 +99,17 @@ dependencyManagement {
 
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/uw-it-edm/edm-zuul-proxy"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR") ?: System.getenv("USER")
+                password = System.getenv("GITHUB_TOKEN") ?: System.getenv("GITHUB_PAT")
+            }
+        }
+    }
+
     publications {
         mavenJava(MavenPublication) {
             from components.java
@@ -115,82 +136,6 @@ publishing {
 }
 
 
-artifactory {
-    contextUrl = System.getenv('ARTIFACTORY_CONTEXT')
-    //The base Artifactory URL if not overridden by the publisher/resolver
-
-
-    publish {
-        repository {
-            // The Artifactory repository key to publish to
-            def inferredRepoKey = System.getenv('ARTIFACTORY_SNAPSHOT_REPO')
-
-            if (!version.toString().contains("SNAPSHOT") && !version.toString().contains("dirty")) {
-                inferredRepoKey = System.getenv('ARTIFACTORY_RELEASE_REPO')
-            }
-
-            repoKey = inferredRepoKey
-            logger.lifecycle "Using $inferredRepoKey as publishing repo"
-
-            // Username comes from ~/.gradle/gradle.properties
-            def resolveUserName = project.getProperties().get('eaiw.artifactoryPublishUser')
-            if (!resolveUserName?.trim()) {
-                // try to get it from an environment variable
-                resolveUserName = System.getenv("ARTIFACTORY_PUBLISH_USER")
-            }
-
-            username = resolveUserName
-
-            // Password comes from ~/.gradle/gradle.encrypted.properties
-            if (credentials?.propertyMissing(resolveUserName)) {
-                password = credentials[resolveUserName]
-            } else {
-                // try to get it from an environment variable
-                password = System.getenv("ARTIFACTORY_PUBLISH_PASSWORD")
-            }
-        }
-
-        defaults {
-            publications('mavenJava')
-        }
-    }
-
-    resolve {
-        repository {
-            // The Artifactory repository key to resolve through
-            repoKey = System.getenv('ARTIFACTORY_RESOLVE_REPO')
-
-            // Username comes from ~/.gradle/gradle.properties
-            def resolveUserName = project.getProperties().get('eaiw.artifactoryResolveUser')
-            if (!resolveUserName?.trim()) {
-                // try to get it from an environment variable
-                resolveUserName = System.getenv("ARTIFACTORY_PUBLISH_USER")
-            }
-
-            username = resolveUserName
-
-            // Password comes from ~/.gradle/gradle.encrypted.properties
-            if (credentials?.propertyMissing(resolveUserName)) {
-                password = credentials[resolveUserName]
-            } else {
-                // try to get it from an environment variable
-                password = System.getenv("ARTIFACTORY_PUBLISH_PASSWORD")
-            }
-        }
-    }
-}
-
-// make sure we have an artifact to publish
-artifactoryPublish.dependsOn jar
-
-
-if (version.toString().contains("dirty")) {
-    artifactoryPublish.skip = true // as documented
-    artifactoryPublish.onlyIf { false } // NOT documented
-
-}
-
-artifactoryPublish.dependsOn bootJar
 
 jacocoTestReport.dependsOn test
 //code coverage
