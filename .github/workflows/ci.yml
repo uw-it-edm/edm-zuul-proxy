@@ -1,4 +1,4 @@
-name: CI Build
+name: "edm-zuul-proxy: CI Build"
 
 on:
   push:
@@ -34,10 +34,9 @@ jobs:
           arguments: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Slack Notification
+      - name: Send Notification
         if: ${{ failure() }}
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_TITLE: edm-zuul-proxy Build Alert
-          SLACK_COLOR: '#ff0000'
+        uses: uw-it-edm/notify-microsoft-teams@master
+        with:
+          webhook_url: ${{ secrets.MSTEAMS_CI_BUILDS }}
+          job: ${{ toJson(job) }}
